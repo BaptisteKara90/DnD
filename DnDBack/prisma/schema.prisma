@@ -58,18 +58,41 @@ model Spell {
   updatedAt    DateTime  @updatedAt
 }
 
+model SpellSlot {
+  id         Int @id @default(autoincrement())
+  character  Character @relation(fields: [characterId], references: [id])
+  characterId Int
+  level      Int   // de 1 à 9
+  max        Int   // total slots pour ce niveau
+  used       Int   // slots utilisés
+}
+
 model Character {
   id           Int          @id @default(autoincrement())
   name         String
   level        Int          @default(1)
   raceId       Int
   classId      Int
-  spells       Spell[]      
+  armorClass   Int
+  initiative   Int
+  speed        Int
+  maxHp        Int
+  currentHp    Int
+  temporayHp   Int?
+  hitDiceAvailable  String
+  strength     Int
+  dexterity    Int
+  constitution Int
+  intelligence Int
+  wisdom       Int
+  charisma     Int
+  spells       Spell[] 
+  SpellSlot    SpellSlot[]     
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
   race         Race         @relation(fields: [raceId], references: [id])
-  class        Class        @relation(fields: [classId], references: [id])
+  class        Class        @relation(fields: [classId], references: [id])  
 }
 
 model Weapon {
