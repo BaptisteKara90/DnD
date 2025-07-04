@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Race {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  traits      Trait[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  Characters  Character[]
+}
+
+model Trait {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  raceId      Int?
+  classId     Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  race        Race?    @relation(fields: [raceId], references: [id])
+  class       Class?   @relation(fields: [classId], references: [id])
+}
+
+model Class {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  hitDice     String
+  traits      Trait[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  Characters  Character[]
+}
+
+model Spell {
+  id           Int       @id @default(autoincrement())
+  name         String
+  level        Int
+  school       String
+  castingTime  String
+  range        String
+  components   String[]
+  duration     String
+  description  String
+  characters   Character[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Character {
+  id           Int          @id @default(autoincrement())
+  name         String
+  level        Int          @default(1)
+  raceId       Int
+  classId      Int
+  spells       Spell[]      
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  race         Race         @relation(fields: [raceId], references: [id])
+  class        Class        @relation(fields: [classId], references: [id])
+}
+
+model Weapon {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  type        WeaponType
+  damageDice  String   
+  damageType  DamageType
+  properties  String[] 
+  isMagical   Boolean  @default(false)
+  bonus       Int?     
+  weight      Float?
+  cost        String?  
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum WeaponType {
+  melee
+  ranged
+  thrown
+}
+
+enum DamageType {
+  slashing
+  piercing
+  bludgeoning
+  fire
+  cold
+  lightning
+  poison
+  acid
+  necrotic
+  radiant
+  force
+  thunder
+  psychic
+}
