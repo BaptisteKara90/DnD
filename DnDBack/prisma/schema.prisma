@@ -337,7 +337,6 @@ model User {
   email        String     @unique                 // Email de connexion
   password     String                             // Hash du mot de passe
   username     String     @unique                 // Pseudo visible
-  role         Role        @default(PLAYER)       // Rôle : joueur ou MJ
 
   characters   Character[]                        // Personnages contrôlés
   npcs         Npc[]                              // PNJ créés par le MJ
