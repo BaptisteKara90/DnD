@@ -290,6 +290,7 @@ model Npc {
   level       Int?                            // Niveau éventuel
   hp          Int                             // Points de vie
   stats       Json                            // Ex : { "str": 12, "dex": 14, ... }
+  picture     String?                         // URL de l'image du PNJ
   createdById Int?                            // ID du MJ qui l’a créé
   createdBy   User?     @relation(fields: [createdById], references: [id])
 
