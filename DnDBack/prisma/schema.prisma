@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // previewFeatures = ["prismaSchemaFolder"] TODO separer la bdd
 }
 
 datasource db {
@@ -8,114 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Race {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?
-  traits      Trait[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  Characters  Character[]
-}
-
-model Trait {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  raceId      Int?
-  classId     Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  race        Race?    @relation(fields: [raceId], references: [id])
-  class       Class?   @relation(fields: [classId], references: [id])
-}
-
-model Class {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?
-  hitDice     String
-  traits      Trait[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  Characters  Character[]
-}
-
-model Spell {
-  id           Int       @id @default(autoincrement())
-  name         String
-  level        Int
-  school       String
-  castingTime  String
-  range        String
-  components   String[]
-  duration     String
-  description  String
-  characters   Character[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-}
-
-model SpellSlot {
-  id         Int @id @default(autoincrement())
-  character  Character @relation(fields: [characterId], references: [id])
-  characterId Int
-  level      Int   // de 1 à 9
-  max        Int   // total slots pour ce niveau
-  used       Int   // slots utilisés
-}
-
-model Character {
-  id           Int          @id @default(autoincrement())
-  name         String
-  level        Int          @default(1)
-  raceId       Int
-  classId      Int
-  armorClass   Int
-  initiative   Int
-  speed        Int
-  maxHp        Int
-  currentHp    Int
-  temporayHp   Int?
-  hitDiceAvailable  String
-  strength     Int
-  dexterity    Int
-  constitution Int
-  intelligence Int
-  wisdom       Int
-  charisma     Int
-  spells       Spell[] 
-  SpellSlot    SpellSlot[]     
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  race         Race         @relation(fields: [raceId], references: [id])
-  class        Class        @relation(fields: [classId], references: [id])  
-}
-
-model Weapon {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  type        WeaponType
-  damageDice  String   
-  damageType  DamageType
-  properties  String[] 
-  isMagical   Boolean  @default(false)
-  bonus       Int?     
-  weight      Float?
-  cost        String?  
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
+//
+// === ENUM POUR LES TYPES D’ARMES ET DÉGÂTS ===
+//
 enum WeaponType {
-  melee
-  ranged
-  thrown
+  melee       // Corps à corps
+  ranged      // À distance
+  thrown      // Jetée
 }
 
 enum DamageType {
@@ -132,4 +30,374 @@ enum DamageType {
   force
   thunder
   psychic
+}
+
+//
+// === ENUM POUR LES CARACTÉRISTIQUES ===
+// Utilisée pour lier une compétence à une stat
+//
+enum Ability {
+  STR  // Force
+  DEX  // Dextérité
+  CON  // Constitution
+  INT  // Intelligence
+  WIS  // Sagesse
+  CHA  // Charisme
+}
+
+//
+// === RACES ===
+//
+model Race {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  traits      Trait[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  Characters  Character[]
+}
+
+//
+// === TRAITS RACIAUX / DE CLASSE ===
+//
+model Trait {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  raceId      Int?
+  classId     Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  race        Race?    @relation(fields: [raceId], references: [id])
+  class       Class?   @relation(fields: [classId], references: [id])
+}
+
+//
+// === CLASSES ===
+//
+model Class {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  hitDice     String
+  traits      Trait[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  Characters  Character[]
+  Archetypes  Archetype[]
+}
+
+//
+// === ARCHÉTYPE / SOUS-CLASSE ===
+//
+model Archetype {
+  id          Int       @id @default(autoincrement())
+  name        String
+  classId     Int
+  description String?
+
+  class       Class     @relation(fields: [classId], references: [id])
+  characters  Character[]
+}
+
+//
+// === SORTS ===
+//
+model Spell {
+  id           Int       @id @default(autoincrement())
+  name         String
+  level        Int
+  school       String
+  castingTime  String
+  range        String
+  components   String[]
+  duration     String
+  description  String
+  characters   Character[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+//
+// === EMPLACEMENTS DE SORTS ===
+//
+model SpellSlot {
+  id           Int       @id @default(autoincrement())
+  character    Character @relation(fields: [characterId], references: [id])
+  characterId  Int
+  level        Int
+  max          Int
+  used         Int
+}
+
+//
+// === ARMES ===
+//
+model Weapon {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  type        WeaponType
+  damageDice  String
+  damageType  DamageType
+  properties  String[]
+  isMagical   Boolean  @default(false)
+  bonus       Int?
+  weight      Float?
+  cost        String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  characters  Character[]
+}
+
+//
+// === MAÎTRISES ===
+//
+model Proficiency {
+  id           Int       @id @default(autoincrement())
+  name         String
+  type         ProficiencyType
+  characters   Character[] @relation("CharacterProficiencies")
+}
+
+enum ProficiencyType {
+  weapon
+  armor
+  tool
+  skill
+  saving_throw
+}
+
+//
+// === INVENTAIRE ===
+//
+model InventoryItem {
+  id           Int       @id @default(autoincrement())
+  name         String
+  quantity     Int       @default(1)
+  description  String?
+  weight       Float?
+  equipped     Boolean   @default(false)
+  character    Character @relation(fields: [characterId], references: [id])
+  characterId  Int
+}
+
+//
+// === COMPÉTENCES ===
+//
+model Skill {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique                 // Ex : Acrobaties
+  ability      Ability                          // Caractéristique associée
+  characters   CharacterSkill[]                 // Relation avec personnages
+}
+
+model CharacterSkill {
+  id           Int        @id @default(autoincrement())
+  character    Character  @relation(fields: [characterId], references: [id])
+  characterId  Int
+  skill        Skill      @relation(fields: [skillId], references: [id])
+  skillId      Int
+  proficient   Boolean    @default(false)       // Est-ce que le perso maîtrise cette compétence ?
+  bonus        Int?                             // Bonus additionnel éventuel (objet, race, etc.)
+}
+
+//
+// === PERSONNAGE ===
+//
+model Character {
+  id              Int           @id @default(autoincrement())
+  name            String
+  level           Int           @default(1)
+  raceId          Int
+  classId         Int
+  archetypeId     Int?
+
+  // Combat
+  armorClass      Int
+  initiative      Int
+  speed           Int
+  maxHp           Int
+  currentHp       Int
+  temporayHp      Int?
+  hitDiceAvailable String
+
+  // Caractéristiques
+  strength        Int
+  dexterity       Int
+  constitution    Int
+  intelligence    Int
+  wisdom          Int
+  charisma        Int
+
+  // Infos RP
+  background      String?
+  alignment       String?
+  languages       String[]
+  picture         String?            // URL de l'image du personnage
+
+  // Relations
+  race            Race          @relation(fields: [raceId], references: [id])
+  class           Class         @relation(fields: [classId], references: [id])
+  archetype       Archetype?    @relation(fields: [archetypeId], references: [id])
+  spells          Spell[]
+  SpellSlot       SpellSlot[]
+  weapons         Weapon[]
+  proficiencies   Proficiency[] @relation("CharacterProficiencies")
+  inventory       InventoryItem[]
+  skills          CharacterSkill[]             // Liste des compétences du personnage
+  savingThrows     SavingThrow[]                // Jets de sauvegarde
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  campaignId Int
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+
+//
+// === JETS DE SAUVEGARDE ===
+// Permet de savoir quelles sauvegardes sont maîtrisées et d'ajouter des bonus personnalisés
+//
+model SavingThrow {
+  id           Int        @id @default(autoincrement())
+  character    Character  @relation(fields: [characterId], references: [id])
+  characterId  Int
+  ability      Ability                          // ex : STR, DEX, etc.
+  proficient   Boolean    @default(false)       // maîtrisé ?
+  bonus        Int?                             // bonus spécifique (objet, effet magique, etc.)
+}
+
+//
+// === PNJ (Personnage Non Joueur) ===
+// Créé manuellement par le MJ, utilisé pour l'interaction narrative ou sociale.
+//
+model Npc {
+  id          Int       @id @default(autoincrement())
+  name        String                          // Nom du PNJ
+  description String?                         // Brève description ou fiche narrative
+  role        String?                         // Ex : Marchand, Garde, Roi...
+  alignment   String?                         // Alignement (ex : Loyal Bon)
+  race        String?                         // Race (facultative pour plus de souplesse)
+  class       String?                         // Classe simulée (optionnelle)
+  level       Int?                            // Niveau éventuel
+  hp          Int                             // Points de vie
+  stats       Json                            // Ex : { "str": 12, "dex": 14, ... }
+  createdById Int?                            // ID du MJ qui l’a créé
+  createdBy   User?     @relation(fields: [createdById], references: [id])
+
+  campaignId Int
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+
+//
+// === MONSTRE ===
+// Utilisé principalement pour les combats. Peut venir d’un bestiaire.
+//
+model Monster {
+  id               Int       @id @default(autoincrement())
+  name             String                          // Nom du monstre
+  size             String?                         // Ex : Medium, Large...
+  type             String                           // Ex : Dragon, Mort-vivant
+  alignment        String?
+  armorClass       Int                              // Classe d'armure
+  hitPoints        Int                              // Points de vie
+  speed            String                           // Ex : 30 ft., fly 60 ft.
+  stats            Json                             // Ex : { "str": 18, "dex": 10, ... }
+  languages        String[]                         // Langues parlées
+  challengeRating  Float                            // Facteur de puissance (ex : 0.5, 2, 12)
+  traits           String[]                         // Capacités spéciales (ex : invisibilité)
+  actions          String[]                         // Attaques
+  legendaryActions String[]                         // Actions légendaires (boss, dragons…)
+
+  campaignId Int
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+//
+// === UTILISATEUR ===
+// Gère les comptes joueur ou MJ
+//
+model User {
+  id           Int        @id @default(autoincrement())
+  email        String     @unique                 // Email de connexion
+  password     String                             // Hash du mot de passe
+  username     String     @unique                 // Pseudo visible
+  role         Role        @default(PLAYER)       // Rôle : joueur ou MJ
+
+  characters   Character[]                        // Personnages contrôlés
+  npcs         Npc[]                              // PNJ créés par le MJ
+  memberships  CampaignMembership[]              // Campagnes auxquelles l'utilisateur participe
+  campaigns    Campaign[]                         // Campagnes dont l'utilisateur est propriétaire
+  notes        Note[]                            // Notes personnelles liées à une campagne
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+enum Role {
+  PLAYER      // Joueur standard
+  DM          // Dungeon Master / MJ
+  ADMIN       // (optionnel) 
+}
+
+
+model Campaign {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  summary     String?   // Résumé narratif complet de la campagne
+  notes       Note[]    // Notes de campagne
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  ownerId  Int
+  owner    User @relation(fields: [ownerId], references: [id])
+  memberships CampaignMembership[]    // Utilisateurs liés à cette campagne
+  characters  Character[]             // Personnages joués dans cette campagne
+  npcs        Npc[]                   // PNJ utilisés ici
+  monsters    Monster[]               // Monstres utilisés ici
+}
+
+
+model CampaignMembership {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  campaign    Campaign  @relation(fields: [campaignId], references: [id])
+  campaignId  Int
+  role        CampaignRole           // MJ ou joueur
+  joinedAt    DateTime  @default(now())
+}
+
+enum CampaignRole {
+  DM       // Dungeon Master
+  PLAYER   // Joueur
+}
+
+model Note {
+  id           Int       @id @default(autoincrement())
+  content      String                          // Contenu de la note
+  isPrivate    Boolean    @default(false)      // Visible uniquement par l’auteur
+  author       User       @relation(fields: [authorId], references: [id])
+  authorId     Int
+  campaign     Campaign   @relation(fields: [campaignId], references: [id])
+  campaignId   Int
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
