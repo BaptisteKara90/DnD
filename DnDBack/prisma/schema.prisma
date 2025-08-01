@@ -333,10 +333,12 @@ model Monster {
 // Gère les comptes joueur ou MJ
 //
 model User {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique                 // Email de connexion
-  password     String                             // Hash du mot de passe
-  username     String     @unique                 // Pseudo visible
+  id                 Int        @id @default(autoincrement())
+  email              String     @unique                 // Email de connexion
+  password           String                             // Hash du mot de passe
+  username           String     @unique                 // Pseudo visible
+  isConfirmed        Boolean    @default(false)
+  confirmationToken  String?                       // optionnel, pour token temporaire
 
   characters   Character[]                        // Personnages contrôlés
   npcs         Npc[]                              // PNJ créés par le MJ
