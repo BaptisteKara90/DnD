@@ -5,6 +5,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
       autoSchemaFile: true,
       playground: true,
     }),
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     UserModule,
     AuthModule,
   ],
