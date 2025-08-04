@@ -6,6 +6,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { CampaignModule } from './campaign/campaign.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -18,6 +19,7 @@ import configuration from './config/configuration';
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     UserModule,
     AuthModule,
+    CampaignModule,
   ],
   controllers: [AppController],
   providers: [AppService],
