@@ -22,8 +22,10 @@ export function mapInvitationToModel(invitation: any): CampaignInvitationModel {
   return {
     id: invitation.id,
     campaignId: invitation.campaignId,
+    campaignName: invitation.campaign.name,
     email: invitation.email,
     accepted: invitation.accepted,
+    invitedByUsername: invitation.invitedBy.username,
     createdAt: invitation.createdAt,
     updatedAt: invitation.updatedAt,
   };

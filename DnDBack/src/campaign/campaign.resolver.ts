@@ -7,7 +7,6 @@ import { GqlAuthGuard } from '../auth/gql-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JoinCampaignInput } from './dto/join-campaign.input';
 import { CreateCampaignInvitationInput } from './dto/create-campaign-invitation.input';
-import { AcceptCampaignInvitationInput } from './dto/accept-campaign-invitation.input';
 import { CampaignInvitationModel } from './campaign-invitation.model';
 
 @Resolver()
@@ -45,20 +44,6 @@ export class CampaignResolver {
     @CurrentUser() user: any,
   ): Promise<boolean> {
     await this.campaignService.inviteUserToCampaign(data, user.id);
-    return true;
-  }
-
-  @Mutation(() => Boolean)
-  @UseGuards(GqlAuthGuard)
-  async acceptCampaignInvitation(
-    @Args('data') data: AcceptCampaignInvitationInput,
-    @CurrentUser() user: any,
-  ): Promise<boolean> {
-    await this.campaignService.acceptInvitation(
-      data.campaignId,
-      user.email,
-      user.id,
-    );
     return true;
   }
 

@@ -97,49 +97,6 @@ export class CampaignService {
     });
   }
 
-  async acceptInvitation(
-    campaignId: number,
-    email: string,
-    userId: number,
-  ): Promise<void> {
-    // Vérifie qu’une invitation existe pour cet email et cette campagne
-    const invitation = await this.prisma.campaignInvitation.findFirst({
-      where: {
-        campaignId,
-        email,
-        accepted: false,
-      },
-    });
-
-    if (!invitation) {
-      throw new Error('No invitation found or already accepted.');
-    }
-
-    // Vérifie que l'utilisateur n'est pas déjà membre
-    const alreadyMember = await this.prisma.campaignMembership.findFirst({
-      where: { campaignId, userId },
-    });
-
-    if (alreadyMember) {
-      throw new Error('You are already a member of this campaign.');
-    }
-
-    // Ajoute à la campagne
-    await this.prisma.campaignMembership.create({
-      data: {
-        campaignId,
-        userId,
-        role: 'PLAYER',
-      },
-    });
-
-    // Marque l’invitation comme acceptée
-    await this.prisma.campaignInvitation.update({
-      where: { id: invitation.id },
-      data: { accepted: true },
-    });
-  }
-
   async getPendingInvitations(
     userEmail: string,
   ): Promise<CampaignInvitationModel[]> {
@@ -148,8 +105,54 @@ export class CampaignService {
         email: userEmail,
         accepted: false,
       },
+      include: {
+        campaign: true,
+        invitedBy: true,
+      },
     });
 
     return invitations.map(mapInvitationToModel);
+  }
+
+  async acceptInvitation(
+    invitationId: number,
+    userId: number,
+  ): Promise<CampaignInvitationModel> {
+    const invitation = await this.prisma.campaignInvitation.findUnique({
+      where: { id: invitationId },
+      include: {
+        campaign: true,
+        invitedBy: true,
+      },
+    });
+
+    if (!invitation || invitation.userId !== userId) {
+      throw new Error(
+        'Invitation introuvable ou non destinée à cet utilisateur.',
+      );
+    }
+
+    if (invitation.accepted) {
+      throw new Error('Cette invitation a déjà été acceptée.');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.campaignInvitation.update({
+        where: { id: invitationId },
+        data: { accepted: true },
+      }),
+      this.prisma.campaignMembership.create({
+        data: {
+          campaignId: invitation.campaignId,
+          userId: userId,
+          role: 'PLAYER', // ou CampaignRole.PLAYER si tu utilises l'enum Prisma
+        },
+      }),
+    ]);
+
+    return mapInvitationToModel({
+      ...invitation,
+      accepted: true,
+    });
   }
 }
