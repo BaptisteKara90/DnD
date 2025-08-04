@@ -346,6 +346,7 @@ model User {
   memberships  CampaignMembership[]              // Campagnes auxquelles l'utilisateur participe
   campaigns    Campaign[]                         // Campagnes dont l'utilisateur est propriétaire
   notes        Note[]                            // Notes personnelles liées à une campagne
+  campaignInvitationsSent CampaignInvitation[] @relation("UserSentInvitations")
 
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -373,6 +374,7 @@ model Campaign {
   characters  Character[]             // Personnages joués dans cette campagne
   npcs        Npc[]                   // PNJ utilisés ici
   monsters    Monster[]               // Monstres utilisés ici
+  invitations  CampaignInvitation[]
 }
 
 
@@ -402,4 +404,16 @@ model Note {
 
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+}
+
+model CampaignInvitation {
+  id          Int      @id @default(autoincrement())
+  campaignId  Int
+  email       String
+  invitedById Int
+  accepted    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  campaign    Campaign @relation(fields: [campaignId], references: [id])
+  invitedBy    User      @relation("UserSentInvitations", fields: [invitedById], references: [id])
 }

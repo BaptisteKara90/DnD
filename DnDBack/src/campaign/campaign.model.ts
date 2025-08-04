@@ -1,4 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { CampaignRole } from '@prisma/client';
 
 @ObjectType()
 export class CampaignModel {
@@ -19,4 +20,10 @@ export class CampaignModel {
 
   @Field()
   updatedAt: Date;
+
+  @Field(() => Int)
+  ownerId: number;
+
+  @Field(() => CampaignRole)
+  role: CampaignRole;
 }
