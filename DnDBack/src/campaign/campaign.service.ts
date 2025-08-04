@@ -117,6 +117,7 @@ export class CampaignService {
   async acceptInvitation(
     invitationId: number,
     userId: number,
+    userEmail: string,
   ): Promise<CampaignInvitationModel> {
     const invitation = await this.prisma.campaignInvitation.findUnique({
       where: { id: invitationId },
@@ -126,7 +127,7 @@ export class CampaignService {
       },
     });
 
-    if (!invitation || invitation.userId !== userId) {
+    if (!invitation || invitation.email !== userEmail) {
       throw new Error(
         'Invitation introuvable ou non destinée à cet utilisateur.',
       );
@@ -139,13 +140,16 @@ export class CampaignService {
     await this.prisma.$transaction([
       this.prisma.campaignInvitation.update({
         where: { id: invitationId },
-        data: { accepted: true },
+        data: {
+          accepted: true,
+          userId, // on associe maintenant l'utilisateur réel à l'invitation
+        },
       }),
       this.prisma.campaignMembership.create({
         data: {
           campaignId: invitation.campaignId,
           userId: userId,
-          role: 'PLAYER', // ou CampaignRole.PLAYER si tu utilises l'enum Prisma
+          role: 'PLAYER',
         },
       }),
     ]);
@@ -153,6 +157,7 @@ export class CampaignService {
     return mapInvitationToModel({
       ...invitation,
       accepted: true,
+      user: { id: userId }, // à ajuster selon ton mapper
     });
   }
 }

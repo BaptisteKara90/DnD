@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Resolver, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Int, Query } from '@nestjs/graphql';
 import { CampaignService } from './campaign.service';
 import { GqlAuthGuard } from '../auth/gql-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -15,6 +15,18 @@ export class CampaignInvitationResolver {
     @Args('invitationId', { type: () => Int }) invitationId: number,
     @CurrentUser() user: any,
   ): Promise<CampaignInvitationModel> {
-    return this.campaignService.acceptInvitation(invitationId, user.id);
+    return this.campaignService.acceptInvitation(
+      invitationId,
+      user.id,
+      user.email,
+    );
+  }
+
+  @Query(() => [CampaignInvitationModel])
+  @UseGuards(GqlAuthGuard)
+  async pendingInvitations(
+    @CurrentUser() user: any,
+  ): Promise<CampaignInvitationModel[]> {
+    return this.campaignService.getPendingInvitations(user.email);
   }
 }

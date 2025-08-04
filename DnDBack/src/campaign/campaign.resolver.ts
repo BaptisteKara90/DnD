@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query, Int } from '@nestjs/graphql';
 import { CampaignModel } from './campaign.model';
 import { CampaignService } from './campaign.service';
 import { CreateCampaignInput } from './dto/create-campaign.input';
@@ -53,5 +53,23 @@ export class CampaignResolver {
     @CurrentUser() user: any,
   ): Promise<CampaignInvitationModel[]> {
     return this.campaignService.getPendingInvitations(user.email);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async declineInvitation(
+    @Args('invitationId', { type: () => Int }) invitationId: number,
+    @CurrentUser() user: any,
+  ): Promise<boolean> {
+    return this.campaignService.declineInvitation(invitationId, user.id);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async deleteInvitationAsDm(
+    @Args('invitationId', { type: () => Int }) invitationId: number,
+    @CurrentUser() user: any,
+  ): Promise<boolean> {
+    return this.campaignService.deleteInvitationAsDm(invitationId, user.id);
   }
 }
