@@ -160,4 +160,49 @@ export class CampaignService {
       user: { id: userId }, // à ajuster selon ton mapper
     });
   }
+
+  async declineInvitation(
+    invitationId: number,
+    userId: number,
+  ): Promise<boolean> {
+    const invitation = await this.prisma.campaignInvitation.findUnique({
+      where: { id: invitationId },
+    });
+
+    if (!invitation || invitation.userId !== userId) {
+      throw new Error(
+        'Invitation introuvable ou non destinée à cet utilisateur.',
+      );
+    }
+
+    await this.prisma.campaignInvitation.delete({
+      where: { id: invitationId },
+    });
+
+    return true;
+  }
+
+  async deleteInvitationAsDm(
+    invitationId: number,
+    userId: number,
+  ): Promise<boolean> {
+    const invitation = await this.prisma.campaignInvitation.findUnique({
+      where: { id: invitationId },
+      include: {
+        campaign: true,
+      },
+    });
+
+    if (!invitation || invitation.invitedById !== userId) {
+      throw new Error(
+        'Seul le MJ ayant envoyé l’invitation peut la supprimer.',
+      );
+    }
+
+    await this.prisma.campaignInvitation.delete({
+      where: { id: invitationId },
+    });
+
+    return true;
+  }
 }
