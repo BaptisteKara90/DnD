@@ -85,6 +85,7 @@ export function Navbar() {
       <NavLinks open={open}>
         <NavLink href="/">Accueil</NavLink>
         <NavLink href="/campaign">Campagnes</NavLink>
+        <NavLink href="/profil">Profile</NavLink>
         <NavLinkModal onClick={() => setOpenModal(true)}>Connexion/inscription</NavLinkModal>
         {openModal && <AuthModal onClose={() => setOpenModal(false)} />}
       </NavLinks>
