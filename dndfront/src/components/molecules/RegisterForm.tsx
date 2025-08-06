@@ -3,6 +3,8 @@
 
 import styled from '@emotion/styled';
 import { useState } from 'react';
+import { useCreateUserMutation } from '@/graphql/generated';
+
 
 const Form = styled.form`
   display: flex;
@@ -11,14 +13,19 @@ const Form = styled.form`
 `;
 
 export function RegisterForm() {
+  const [createUser] = useCreateUserMutation();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Appelle ton endpoint GraphQL ici
-    console.log('Register:', { email, username, password });
+    try {
+      const result = await createUser({ variables: { data: { email, username, password } } });
+      console.log('User created:', result.data?.createUser);
+    } catch (err) {
+      console.error('Error creating user:', err);
+    }
   };
 
   return (

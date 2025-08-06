@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
-  uri: process.env.NESTJS_GRAPHQL_ENDPOINT || 'http://localhost:3000/graphql',
+  uri: process.env.NESTJS_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql',
 });
 
 const authLink = setContext((_, { headers }) => {

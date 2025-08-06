@@ -15,9 +15,11 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 type Documents = {
     "fragment UserFields on User {\n  id\n  email\n  username\n}": typeof types.UserFieldsFragmentDoc,
+    "mutation CreateUser($data: CreateUserInput!) {\n  createUser(data: $data) {\n    ...UserFields\n  }\n}": typeof types.CreateUserDocument,
 };
 const documents: Documents = {
     "fragment UserFields on User {\n  id\n  email\n  username\n}": types.UserFieldsFragmentDoc,
+    "mutation CreateUser($data: CreateUserInput!) {\n  createUser(data: $data) {\n    ...UserFields\n  }\n}": types.CreateUserDocument,
 };
 
 /**
@@ -38,6 +40,10 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "fragment UserFields on User {\n  id\n  email\n  username\n}"): (typeof documents)["fragment UserFields on User {\n  id\n  email\n  username\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation CreateUser($data: CreateUserInput!) {\n  createUser(data: $data) {\n    ...UserFields\n  }\n}"): (typeof documents)["mutation CreateUser($data: CreateUserInput!) {\n  createUser(data: $data) {\n    ...UserFields\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
