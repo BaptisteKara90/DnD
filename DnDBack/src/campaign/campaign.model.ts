@@ -1,5 +1,10 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { CampaignRole } from '@prisma/client';
+import { registerEnumType } from '@nestjs/graphql';
+
+registerEnumType(CampaignRole, {
+  name: 'CampaignRole',
+});
 
 @ObjectType()
 export class CampaignModel {
