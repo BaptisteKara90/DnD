@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
+import { MailerService } from '../mailer/mailer.service';
+
+
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly mailService: MailerService, 
+  ) {}
 
   findAll() {
     return this.prisma.user.findMany();
@@ -16,15 +23,42 @@ export class UserService {
     });
   }
 
-  async create(data: { email: string; password: string; username: string }) {
+   async create(data: { email: string; password: string; username: string }) {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-    return this.prisma.user.create({
+
+    const confirmationToken = randomBytes(32).toString('hex');
+
+    const user = await this.prisma.user.create({
       data: {
         email: data.email,
-        password: hashedPassword,
         username: data.username,
+        password: hashedPassword,
+        confirmationToken,
+        isConfirmed: false,
       },
     });
+
+ 
+    await this.mailService.sendConfirmationEmail(user.email, confirmationToken);
+
+    return user;
+  }
+
+  async confirmEmail(token: string): Promise<boolean> {
+    const user = await this.prisma.user.findFirst({
+      where: { confirmationToken: token },
+    });
+
+    if (!user) {
+      return false; 
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { isConfirmed: true, confirmationToken: null },
+    });
+
+    return true; 
   }
 }

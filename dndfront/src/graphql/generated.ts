@@ -125,6 +125,7 @@ export type User = {
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
   id: Scalars['Int']['output'];
+  isConfirmed: Scalars['Boolean']['output'];
   updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
 };

@@ -23,4 +23,9 @@ export class UserResolver {
   async createUser(@Args('data') data: CreateUserInput): Promise<User> {
     return this.userService.create(data);
   }
+
+  @Mutation(() => Boolean)
+  async confirmEmail(@Args('token') token: string): Promise<boolean>{
+    return this.userService.confirmEmail(token);
+  }
 }

@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CampaignModule } from './campaign/campaign.module';
 import configuration from './config/configuration';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import configuration from './config/configuration';
     UserModule,
     AuthModule,
     CampaignModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
