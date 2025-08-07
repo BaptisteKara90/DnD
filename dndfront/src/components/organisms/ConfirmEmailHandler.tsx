@@ -30,7 +30,7 @@ export function ConfirmEmailHandler() {
     };
 
     confirm();
-  }, [token]);
+  }, [token]); 
 
   return (
     <div style={{ padding: '2rem', textAlign: 'center' }}>
