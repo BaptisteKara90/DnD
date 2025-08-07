@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { MailerService } from '../mailer/mailer.service';
+import { User } from './user.model';
 
 
 
@@ -45,20 +46,16 @@ export class UserService {
     return user;
   }
 
-  async confirmEmail(token: string): Promise<boolean> {
+  async confirmEmail(token: string): Promise<User> {
     const user = await this.prisma.user.findFirst({
       where: { confirmationToken: token },
     });
 
-    if (!user) {
-      return false; 
-    }
+    if (!user) throw new Error('Token invalide ou expiré');
 
-    await this.prisma.user.update({
+    return this.prisma.user.update({
       where: { id: user.id },
       data: { isConfirmed: true, confirmationToken: null },
     });
-
-    return true; 
   }
 }

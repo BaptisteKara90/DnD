@@ -5,7 +5,7 @@ import { CreateUserInput } from './dto/create-user.input';
 
 @Resolver(() => User)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Query(() => [User])
   async users(): Promise<User[]> {
@@ -24,8 +24,8 @@ export class UserResolver {
     return this.userService.create(data);
   }
 
-  @Mutation(() => Boolean)
-  async confirmEmail(@Args('token') token: string): Promise<boolean>{
+  @Mutation(() => User)
+  async confirmEmail(@Args('token', { type: () => String }) token: string): Promise<User> {
     return this.userService.confirmEmail(token);
   }
 }
