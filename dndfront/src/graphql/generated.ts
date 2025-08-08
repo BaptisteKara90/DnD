@@ -57,12 +57,6 @@ export type CreateCampaignInvitationInput = {
   email: Scalars['String']['input'];
 };
 
-export type CreateUserInput = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  username: Scalars['String']['input'];
-};
-
 export type JoinCampaignInput = {
   campaignId: Scalars['Int']['input'];
 };
@@ -71,11 +65,12 @@ export type Mutation = {
   __typename?: 'Mutation';
   confirmEmail: User;
   createCampaign: CampaignModel;
-  createUser: User;
   declineInvitation: Scalars['Boolean']['output'];
   deleteInvitationAsDm: Scalars['Boolean']['output'];
   inviteToCampaign: Scalars['Boolean']['output'];
   joinCampaign: CampaignModel;
+  login: Scalars['String']['output'];
+  register: Scalars['String']['output'];
 };
 
 
@@ -86,11 +81,6 @@ export type MutationConfirmEmailArgs = {
 
 export type MutationCreateCampaignArgs = {
   data: CreateCampaignInput;
-};
-
-
-export type MutationCreateUserArgs = {
-  data: CreateUserInput;
 };
 
 
@@ -111,6 +101,19 @@ export type MutationInviteToCampaignArgs = {
 
 export type MutationJoinCampaignArgs = {
   data: JoinCampaignInput;
+};
+
+
+export type MutationLoginArgs = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
+
+export type MutationRegisterArgs = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type Query = {
@@ -145,12 +148,14 @@ export type ConfirmEmailMutationVariables = Exact<{
 
 export type ConfirmEmailMutation = { __typename?: 'Mutation', confirmEmail: { __typename?: 'User', id: number, email: string, username: string, isConfirmed: boolean } };
 
-export type CreateUserMutationVariables = Exact<{
-  data: CreateUserInput;
+export type RegisterMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number, email: string, username: string, isConfirmed: boolean } };
+export type RegisterMutation = { __typename?: 'Mutation', register: string };
 
 export const UserFieldsFragmentDoc = gql`
     fragment UserFields on User {
@@ -196,36 +201,36 @@ export function useConfirmEmailMutation(baseOptions?: Apollo.MutationHookOptions
 export type ConfirmEmailMutationHookResult = ReturnType<typeof useConfirmEmailMutation>;
 export type ConfirmEmailMutationResult = Apollo.MutationResult<ConfirmEmailMutation>;
 export type ConfirmEmailMutationOptions = Apollo.BaseMutationOptions<ConfirmEmailMutation, ConfirmEmailMutationVariables>;
-export const CreateUserDocument = gql`
-    mutation CreateUser($data: CreateUserInput!) {
-  createUser(data: $data) {
-    ...UserFields
-  }
+export const RegisterDocument = gql`
+    mutation Register($email: String!, $username: String!, $password: String!) {
+  register(email: $email, username: $username, password: $password)
 }
-    ${UserFieldsFragmentDoc}`;
-export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+    `;
+export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
- * __useCreateUserMutation__
+ * __useRegisterMutation__
  *
- * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useRegisterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ * const [registerMutation, { data, loading, error }] = useRegisterMutation({
  *   variables: {
- *      data: // value for 'data'
+ *      email: // value for 'email'
+ *      username: // value for 'username'
+ *      password: // value for 'password'
  *   },
  * });
  */
-export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
+        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
       }
-export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
-export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
-export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
+export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;

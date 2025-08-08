@@ -20,11 +20,6 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  async createUser(@Args('data') data: CreateUserInput): Promise<User> {
-    return this.userService.create(data);
-  }
-
-  @Mutation(() => User)
   async confirmEmail(@Args('token', { type: () => String }) token: string): Promise<User> {
     return this.userService.confirmEmail(token);
   }

@@ -24,28 +24,6 @@ export class UserService {
     });
   }
 
-   async create(data: { email: string; password: string; username: string }) {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-
-    const confirmationToken = randomBytes(32).toString('hex');
-
-    const user = await this.prisma.user.create({
-      data: {
-        email: data.email,
-        username: data.username,
-        password: hashedPassword,
-        confirmationToken,
-        isConfirmed: false,
-      },
-    });
-
- 
-    await this.mailService.sendConfirmationEmail(user.email, confirmationToken);
-
-    return user;
-  }
-
   async confirmEmail(token: string): Promise<User> {
     const user = await this.prisma.user.findFirst({
       where: { confirmationToken: token },

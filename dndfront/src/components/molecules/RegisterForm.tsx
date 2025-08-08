@@ -3,7 +3,7 @@
 
 import styled from '@emotion/styled';
 import { useState } from 'react';
-import { useCreateUserMutation } from '@/graphql/generated';
+import { useRegisterMutation } from '@/graphql/generated';
 
 
 const Form = styled.form`
@@ -13,7 +13,7 @@ const Form = styled.form`
 `;
 
 export function RegisterForm() {
-  const [createUser] = useCreateUserMutation();
+  const [register] = useRegisterMutation();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -21,10 +21,10 @@ export function RegisterForm() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const result = await createUser({ variables: { data: { email, username, password } } });
-      console.log('User created:', result.data?.createUser);
+      const result = await register({ variables: { email, username, password } });
+      console.log('User registered:', result.data?.register);
     } catch (err) {
-      console.error('Error creating user:', err);
+      console.error('Error registering user:', err);
     }
   };
 
