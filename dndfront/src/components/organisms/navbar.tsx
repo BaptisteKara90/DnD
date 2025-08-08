@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import Link from 'next/link';
 import { useState } from 'react';
 import { AuthModal } from '@/components/organisms/AuthModal';
+import { useAuth } from '@/app/providers/AuthProvider';
 
 const NavbarWrapper = styled.nav`
   background-color: #1a1a1a;
@@ -70,6 +71,7 @@ const NavLinkModal = styled('div')`
 `;
 
 export function Navbar() {
+  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
@@ -84,9 +86,15 @@ export function Navbar() {
 
       <NavLinks open={open}>
         <NavLink href="/">Accueil</NavLink>
-        <NavLink href="/campaign">Campagnes</NavLink>
-        <NavLink href="/profil">Profile</NavLink>
-        <NavLinkModal onClick={() => setOpenModal(true)}>Connexion/inscription</NavLinkModal>
+        {user ? (
+          <>
+            <NavLink href="/campaign">Campagnes</NavLink>
+            <NavLink href="/profil">{user.username}</NavLink>
+            <NavLink href="/logout" onClick={logout}>Déconnexion</NavLink>
+          </>
+        ) : (
+          <NavLinkModal onClick={() => setOpenModal(true)}>Connexion/Inscription</NavLinkModal>
+        )}
         {openModal && <AuthModal onClose={() => setOpenModal(false)} />}
       </NavLinks>
     </Container>

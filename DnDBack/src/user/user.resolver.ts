@@ -18,9 +18,4 @@ export class UserResolver {
   ): Promise<User | null> {
     return this.userService.findOne(id);
   }
-
-  @Mutation(() => User)
-  async confirmEmail(@Args('token', { type: () => String }) token: string): Promise<User> {
-    return this.userService.confirmEmail(token);
-  }
 }

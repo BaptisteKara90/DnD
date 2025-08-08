@@ -1,7 +1,9 @@
 'use client';
 
 import styled from '@emotion/styled';
+import { useLoginMutation } from '@/graphql/generated';
 import { useState } from 'react';
+import { useAuth } from '@/app/providers/AuthProvider';
 
 const Form = styled.form`
   display: flex;
@@ -10,13 +12,35 @@ const Form = styled.form`
 `;
 
 export function LoginForm() {
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [loginMutation, { loading, error }] = useLoginMutation();
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Appelle ton endpoint GraphQL ici
-    console.log('Login:', { email, password });
+
+    try {
+      const { data } = await loginMutation({ variables: { email, password } });
+
+      if (!data?.login || !data.login.token || !data.login.user) {
+        throw new Error("Données de connexion incomplètes");
+      }
+
+      const { token, user } = data.login;
+
+      // Stocker le token
+      localStorage.setItem('token', token);
+
+      // Mettre à jour le contexte
+      login(user, token);
+
+      console.log('Connexion réussie :', user);
+    } catch (err) {
+      console.error('Erreur de connexion :', err);
+    }
   };
 
   return (
@@ -36,7 +60,10 @@ export function LoginForm() {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <button type="submit">Se connecter</button>
+      <button type="submit" disabled={loading}>
+        {loading ? 'Connexion...' : 'Se connecter'}
+      </button>
+      {error && <p style={{ color: 'red' }}>Erreur : {error.message}</p>}
     </Form>
   );
 }

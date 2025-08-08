@@ -51,16 +51,24 @@ export class AuthService {
     });
   }
 
-  async login(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException('Email invalide');
+ async login(email: string, password: string) {
+  const user = await this.prisma.user.findUnique({ where: { email } });
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new UnauthorizedException('Mot de passe incorrect');
-
-    const token = await this.signToken(user.id, user.email);
-    return { user, token };
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    throw new Error('Email ou mot de passe incorrect');
   }
+
+  if (!user.isConfirmed) {
+    throw new Error('Email non confirmé');
+  }
+
+  const token = this.jwt.sign({ sub: user.id });
+
+  return {
+    token,
+    user,
+  };
+}
 
   private async signToken(userId: number, email: string): Promise<string> {
     return this.jwt.signAsync({ sub: userId, email });
